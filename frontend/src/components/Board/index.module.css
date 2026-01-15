@@ -1,0 +1,18 @@
+
+.textElementBox {
+  position: fixed;
+  border: none;
+  background: transparent;
+  resize: none;
+  outline: none;
+  padding: 0;
+  margin: 0;
+  width: max-content;
+  height: max-content;
+  overflow: hidden;
+  font-size: inherit;
+  font-family: inherit;
+  color: inherit;
+  line-height: inherit;
+  font-family: "Caveat", cursive;
+}
