@@ -215,7 +215,7 @@ export const BoardProvider = ({children}) => {
         }
   }
   const HandleMouseUp = ()=>{
-       if(BOARD_ACTIONS.ToolActionType===TOOL_ACTION_TYPES.WRITING)return;
+      if(BoardState.ToolActionType===TOOL_ACTION_TYPES.WRITING)return;
        DispatchBoardAction({
         type: BOARD_ACTIONS.CHANGE_ACTION_TYPE,
         payload:{actiontype:TOOL_ACTION_TYPES.NONE}

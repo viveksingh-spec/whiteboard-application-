@@ -47,17 +47,20 @@ const Login = async(req,res)=>{
 
         const access_token = await user.GenerateAccessToken()
         const refresh_token = await user.GenerateRefreshToken()
+        user.refreshToken = refresh_token
+        await user.save()
 
+            const isProd = process.env.NODE_ENV === "production";
         res.cookie("refreshToken", refresh_token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
+                  secure: isProd,
+                  sameSite: isProd ? "none" : "lax",
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
         successResponse(res,200,"Logged in !!",{access_token:access_token})
       } catch (error) {
-          return error(rws,500,"something went wrong!!")
+              return errorResponse(res,500,"something went wrong!!",error)
       }
 }
 

@@ -1,8 +1,8 @@
 import { useContext, useState } from "react"
 import {assets} from "../assets/assets.js"
 import {toast} from "react-toastify"
-import axios from "axios"
 import { canvascontext } from "../store/CanvasHistory.js"
+import { apiClient } from "../utils/apiClient.js"
 export const Loginsignup = () => {
   const [state, setstate] = useState("Login")
   const [name,setname] = useState('')
@@ -11,14 +11,12 @@ export const Loginsignup = () => {
 
   const {logopen,Accesstoken,setAccesstoken,setlogopen} = useContext(canvascontext)
 
-const backend_url = import.meta.env.VITE_BACKEND_URL
-
   const onsubmithandler = async(e) => {
           e.preventDefault();
           try {
             if(state==='Login'){
                 try {
-                   const {data} = await axios.post(backend_url+'/user/login',{email,password})
+                   const {data} = await apiClient.post('/user/login',{email,password})
                    if(data.success){
                        setAccesstoken(data.data.access_token)
                        localStorage.setItem('token',data.data.access_token)
@@ -31,14 +29,14 @@ const backend_url = import.meta.env.VITE_BACKEND_URL
                 }
             }else{
               try {
-                   const {data} = await axios.post(backend_url+'/user/register',{username:name,email,password})
+                   const {data} = await apiClient.post('/user/register',{username:name,email,password})
                    console.log(data)
                    if(data.success){
                        toast.success(`${state} successful!`);
                        setstate("Login")
                    }
                 } catch (error) {
-                  toast.error(data.message || 'Something went wrong');
+                  toast.error(error?.response?.data?.message || 'Something went wrong');
                 }
             }
           } catch (error) {

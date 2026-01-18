@@ -56,10 +56,8 @@ const UpdateCanvas = async(req,res)=>{
             if(canvas.owner.toString()!==userId){
                   return errorResponse(res,403,"not autherized person to get canvas")
             }
-            console.log(elements)
             canvas.elements = elements
             await canvas.save()
-    
             successResponse(res,200,"canvas updated successfully")
         } catch (error) {
              return errorResponse(res,500,"something went wrong") 
@@ -78,7 +76,7 @@ const DeleteCanvas = async(req,res)=>{
                   return errorResponse(res,403,"not autherized person to delete canvas")
             }
             await Canvas.findByIdAndDelete(canvasId);
-            successResponse(res,200,"canvas delete successfully")
+              successResponse(res,200,"canvas delete successfully")
         } catch (error) {
              return errorResponse(res,500,"something went wrong",error) 
         }

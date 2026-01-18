@@ -12,7 +12,6 @@ const verify = async(req,res,next)=>{
         req.userId = decoded.id
         next()
        } catch (error) {
-        console.log(error)
         return errorResponse(res,401,"Invalid or expired token")
        }
 }

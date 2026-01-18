@@ -6,9 +6,10 @@ const canvasSchema = new mongoose.Schema({
         ref:"User",
         required:true
        },
-       elements:[{
-        type:[mongoose.Schema.Types.Mixed]
-       }]
+       elements:{
+        type:[mongoose.Schema.Types.Mixed],
+        default:[]
+       }
 },{timestamps:true})
 
 const Canvas = mongoose.model("Canvas",canvasSchema);

@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser"
 import { ConnectDB } from "./db.js"
 import { authrouter } from "./routers/userrouter.js"
 import { canvasrouter } from "./routers/canvasrouter.js"
+import { refreshrouter } from "./routers/refreshrouter.js"
 dotenv.config()
 
 
@@ -21,11 +22,12 @@ app.use(express.json())
 app.use(express.urlencoded({extended:true}))
 
 app.use('/user',authrouter)
+app.use('/user',refreshrouter)
 app.use('/canvas',canvasrouter)
-const PORT = 5050
+const PORT = process.env.PORT||5050
 
-app.get('/',()=>{
-       return "app is running "
+app.get('/',(req,res)=>{
+  return res.send("app is running")
 })
 
 app.listen(PORT,()=>{

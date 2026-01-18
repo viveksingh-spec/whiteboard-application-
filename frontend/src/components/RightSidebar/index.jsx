@@ -1,9 +1,9 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { canvascontext } from "../../store/CanvasHistory";
 import { MdDelete } from "react-icons/md";
-import axios from "axios";
 import { BoardContext } from "../../store/BoardContext";
 import { toast } from "react-toastify";
+import { apiClient } from "../../utils/apiClient.js";
 
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -21,6 +21,8 @@ export default function RightSidebar() {
   } = useContext(canvascontext);
 
   const { SetelementsOnApicall,elements } = useContext(BoardContext);
+
+  const skipNextSaveRef = useRef(false);
 
   const [allcanvas, setallcanvas] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -40,11 +42,7 @@ export default function RightSidebar() {
         setLoading(true);
         setLoadError("");
 
-        const { data } = await axios.get(`${backendUrl}/canvas/getall`,{
-          headers: {
-            Authorization: `Bearer ${Accesstoken}`,
-          },
-        });
+        const { data } = await apiClient.get(`/canvas/getall`);
         if (data?.success) {
           setallcanvas(Array.isArray(data.data) ? data.data : []);
         } else {
@@ -96,11 +94,7 @@ export default function RightSidebar() {
 
   const HandleDelete = async(canvasId)=>{
         try {
-            const { data } = await axios.delete(`${backendUrl}/canvas/delete/${canvasId}`, {
-          headers: {
-            Authorization:`Bearer ${Accesstoken}`,
-          },
-        });
+            const { data } = await apiClient.delete(`/canvas/delete/${canvasId}`);
             if(data.success){
                   fetchAllCanvas();
                   toast.success(data.message || "canvas deleted successfully")
@@ -113,11 +107,7 @@ export default function RightSidebar() {
 
   const HandleCreateCanvas = async()=>{
        try {
-            const { data } = await axios.post(`${backendUrl}/canvas/create`,{Credential:true},{
-                 headers: {
-                   Authorization:`Bearer ${Accesstoken}`,
-                 },
-            });
+            const { data } = await apiClient.post(`/canvas/create`,{});
             if(data.success){
                  fetchAllCanvas();
                  toast.success(data.message || "canvas successfully created")
@@ -127,36 +117,51 @@ export default function RightSidebar() {
        }
   }
 
+  const handleSelectCanvas = (canvas) => {
+    if (!canvas?._id) return;
+    skipNextSaveRef.current = true;
+    SetCurrentCanvas(canvas._id);
+    SetelementsOnApicall(Array.isArray(canvas?.elements) ? canvas.elements : []);
+    setSidebarOpen(false);
+  };
+
   useEffect(()=>{
-     const controller = new AbortController()
-      const fetchdata = async()=>{
-          try {
-           const {data} = await axios.put(`${backendUrl}/canvas/update`,
-            {
-                 canvasId:CurrentCanvas,
-                 elements
-            },
-            {
-              headers:{
-              Authorization:Accesstoken
-              },
-              withCredentials: true,
-              signal: controller.signal
-            },
-        )
-           if(data.success){
-                 console.log("canvas updated successfully")
-           }
-          } catch (error) {
-              console.error(error)
-          }
+      if (!backendUrl) return;
+      if (!isLoggedIn) return;
+      if (!CurrentCanvas) return;
+
+      if (skipNextSaveRef.current) {
+        skipNextSaveRef.current = false;
+        return;
       }
 
-      fetchdata()
+      const controller = new AbortController();
+      const debounceMs = 800;
 
-      return ()=>controller.abort()
+      const timeoutId = setTimeout(async () => {
+        try {
+          await apiClient.put(
+            `/canvas/update`,
+            {
+              canvasId: CurrentCanvas,
+              elements,
+            },
+            {
+              signal: controller.signal,
+            }
+          );
+        } catch (error) {
+          if (error?.name !== "CanceledError") {
+            console.error(error);
+          }
+        }
+      }, debounceMs);
 
-  },[elements])
+      return () => {
+        clearTimeout(timeoutId);
+        controller.abort();
+      };
+  },[elements, CurrentCanvas, Accesstoken, isLoggedIn, backendUrl])
 
   return (
     <>
@@ -202,7 +207,6 @@ export default function RightSidebar() {
             </div>
 
             <div className="p-4 text-slate-600">
-                  {/* here all canvases are going to show  */}
                   <button 
                   className="bg-blue-600 p-2 w-full rounded-2xl text-white font-semibold"
                   onClick={()=>HandleCreateCanvas()}
@@ -214,17 +218,10 @@ export default function RightSidebar() {
                     allcanvas.map((element,idx)=>(
                             <div 
                             key={idx}
-                            className="flex justify-between p-2 border-2 shadow-2xl text-xl m-3 rounded-2xl border-gray-100 cursor-pointer hover:bg-amber-50"
-                            onClick={()=>SetCurrentCanvas(element._id)}
+                            className={`flex justify-between p-2 border-2 shadow-2xl text-xl m-3 rounded-2xl border-gray-100 cursor-pointer hover:bg-amber-50 ${CurrentCanvas===element._id ? "text-blue-400" : ""}`}
+                            onClick={()=>handleSelectCanvas(element)}
                             >
-                                <p
-                                  onClick={(e)=>{
-                                    e.stopPropagation();
-                                    SetelementsOnApicall(Array.isArray(element?.elements) ? element.elements : []);
-                                  }}
-                                >
-                                  Canvas {idx+1}
-                                </p>
+                                <p>Canvas {idx+1}</p>
                                 <MdDelete 
                                 onClick={(e)=>{
                                   e.stopPropagation();
