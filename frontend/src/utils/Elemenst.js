@@ -27,7 +27,7 @@ const GenRoughElements = (id, x1, y1, x2, y2, { type,stroke,fill,size}) => {
 
   switch (type) {
     case TOOL_ITEMS.LINE:
-      return {
+      const ele = {
         id,
         x1,
         y1,
@@ -35,7 +35,8 @@ const GenRoughElements = (id, x1, y1, x2, y2, { type,stroke,fill,size}) => {
         y2,
         type,
         roughEle: gen.line(x1, y1, x2, y2, options),
-      };
+      }
+      return ele
 
     case TOOL_ITEMS.RECTANGLE:
       return {
@@ -131,7 +132,9 @@ export const getSvgPathFromStroke = (stroke) => {
 };
 
 export const EraseElements = (element, pointX, pointY) => {
+  if (!element || typeof element !== "object") return false;
   const { x1, y1, x2, y2, type } = element;
+  if (!type) return false;
   const context = document.getElementById("canvas").getContext("2d");
   switch (type) {
     case TOOL_ITEMS.LINE:
@@ -175,7 +178,7 @@ export const EraseElements = (element, pointX, pointY) => {
         isPointCloseToLine(x1, y1 + textHeight, x1, y1, pointX, pointY)
       );
     default:
-      throw new Error("Type not recognized");
+      return false;
   }
 };
 

@@ -1,8 +1,8 @@
 @reference "tailwindcss";
 
 .container {
-  @apply absolute right-5 top-1/2 border border-gray-400 flex p-2 flex-col;
-  transform: translateY(-50%);
+  @apply absolute left-1/2 top-5 border border-gray-400 p-2 flex;
+  transform: translateX(-50%);
   box-shadow: 1px 0 10px rgba(0, 0, 0, 0.2);
 }
 .items{

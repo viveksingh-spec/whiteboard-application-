@@ -8,18 +8,37 @@ pnpm-debug.log*
 lerna-debug.log*
 
 
-.env
+# Dependencies
+node_modules/
 
-node_modules
-dist
-dist-ssr
+# Environment files (keep examples)
+.env
+.env.*
+!.env.example
+!.env.template
+
+# Build outputs
+dist/
+dist-ssr/
+
+# Vite cache
+.vite/
+
+# Local-only files
 *.local
+
+# Test coverage
+coverage/
+
+# Lint / tooling caches
+.eslintcache
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
 *.suo
 *.ntvs*
 *.njsproj

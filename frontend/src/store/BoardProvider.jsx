@@ -63,7 +63,6 @@ const BoardReducre = (state,action)=>{
                 }
             case BOARD_ACTIONS.ERASE:
               const {clientX,clientY} = action.payload
-              console.log(clientX,clientY)
               let newelement = [...state.elements]
               newelement = newelement.filter((element)=>{
                return !EraseElements(element,clientX,clientY)
@@ -110,9 +109,24 @@ const BoardReducre = (state,action)=>{
           case BOARD_ACTIONS.ONREFRESH:{
              return{
                    ...state,
-                   elements:action.payload.value
+                   elements: Array.isArray(action.payload.value)
+                     ? action.payload.value.filter(
+                         (el) => el && typeof el === "object" && "type" in el
+                       )
+                     : []
              }
           }
+          case BOARD_ACTIONS.SETONAPICALL:{
+            return{
+                ...state,
+                elements: Array.isArray(action.payload.newelements)
+                  ? action.payload.newelements.filter(
+                      (el) => el && typeof el === "object" && "type" in el
+                    )
+                  : []
+            }
+          }
+
           default:
             return state;
          }
@@ -229,7 +243,7 @@ export const BoardProvider = ({children}) => {
   },[])
  
 
-  const SetElementsOnRefresh = (value)=>{
+  const SetElementsOnRefresh = (value)=>{  // function 
           DispatchBoardAction({
             type:BOARD_ACTIONS.ONREFRESH,
             payload:{
@@ -237,6 +251,15 @@ export const BoardProvider = ({children}) => {
             }
           })
   }
+
+const SetelementsOnApicall = (newelements)=>{
+      DispatchBoardAction({
+            type:BOARD_ACTIONS.SETONAPICALL,
+            payload:{
+                newelements
+            }
+      })
+}
 
   const  BoardContextValue = {
          HandleToolItemClick,
@@ -250,7 +273,8 @@ export const BoardProvider = ({children}) => {
          UndoHandler,
          undoElements:BoardState.undoElements,
          RedoHandler,
-         SetElementsOnRefresh
+         SetElementsOnRefresh,
+         SetelementsOnApicall
   }
 
 

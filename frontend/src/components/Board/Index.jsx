@@ -54,8 +54,7 @@ function Canvas() {
               context.restore();
                 break;
             default:
-              return;
-              
+              return;  
           }
       });
 
@@ -113,9 +112,7 @@ useEffect(() => {
 }, [elements]);
 
 useEffect(()=>{
-     console.log("onrefresh this will going to call")
      const canvasele = localStorage.getItem("canvaselements")
-     console.log(JSON.parse(canvasele))  // this will give me an empty array
      if(canvasele){
          SetElementsOnRefresh(JSON.parse(canvasele))
      }

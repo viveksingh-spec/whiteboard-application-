@@ -4,11 +4,14 @@ import './index.css'
 import App from './App.jsx'
 import { BoardProvider } from './store/BoardProvider.jsx'
 import ToolBoxProvider from './store/ToolBoxProvider.jsx'
+import CanvasContextProvider from './store/CanvasContextProvider.jsx'
 
 createRoot(document.getElementById('root')).render(
-      <ToolBoxProvider>
-    <BoardProvider>
+  <CanvasContextProvider>
+    <ToolBoxProvider>
+      <BoardProvider>
             <App/>
-    </BoardProvider>
-      </ToolBoxProvider>
+      </BoardProvider>
+   </ToolBoxProvider>
+   </CanvasContextProvider>
 )
