@@ -14,7 +14,7 @@ const app = express()
 ConnectDB()
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: "https://whiteboard-application-black.vercel.app",
   credentials: true
 }))
 app.use(cookieParser())
